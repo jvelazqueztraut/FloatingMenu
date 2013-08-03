@@ -1,4 +1,4 @@
-#ArcMenu & RayMenu
+#FloatingMenu based on RayMenu by daCapricorn
 ##ArcMenu
 
 An android custom view which looks like the menu in [Path 2.0](https://path.com/) (for iOS).
