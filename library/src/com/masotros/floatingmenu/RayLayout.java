@@ -1,4 +1,4 @@
-package com.capricorn;
+package com.masotros.floatingmenu;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -23,10 +23,10 @@ public class RayLayout extends ViewGroup {
 	private int mChildSize;
 
 	/* the distance between child Views */
-	private int mChildGap;
+	private int mGapSize;
 
-	/* left space to place the switch button */
-	private int mLeftHolderWidth;
+	/* up space to place the switch button */
+	private int mHolderSize;
 
 	private boolean mExpanded = false;
 
@@ -38,45 +38,36 @@ public class RayLayout extends ViewGroup {
 		super(context, attrs);
 
 		if (attrs != null) {
-			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ArcLayout, 0, 0);
-			mChildSize = Math.max(a.getDimensionPixelSize(R.styleable.ArcLayout_childSize, 0), 0);
+			TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RayLayout, 0, 0);
+			mChildSize = Math.max(a.getDimensionPixelSize(R.styleable.RayLayout_childSize, 0), 0);
 			a.recycle();
 
 			a = getContext().obtainStyledAttributes(attrs, R.styleable.RayLayout, 0, 0);
-			mLeftHolderWidth = Math.max(a.getDimensionPixelSize(R.styleable.RayLayout_leftHolderWidth, 0), 0);
+			mHolderSize = Math.max(a.getDimensionPixelSize(R.styleable.RayLayout_holderSize, 0), 0);
 			a.recycle();
-
+			
+			a = getContext().obtainStyledAttributes(attrs, R.styleable.RayLayout, 0, 0);
+			mGapSize = Math.max(a.getDimensionPixelSize(R.styleable.RayLayout_gapSize, 0), 0);
+			a.recycle();
 		}
 	}
-
-	private static int computeChildGap(final float width, final int childCount, final int childSize, final int minGap) {
-		return Math.max((int) (width / childCount - childSize), minGap);
-	}
-
-	private static Rect computeChildFrame(final boolean expanded, final int paddingLeft, final int childIndex,
-			final int gap, final int size) {
-		final int left = expanded ? (paddingLeft + childIndex * (gap + size) + gap) : ((paddingLeft - size) / 2);
-
-		return new Rect(left, 0, left + size, size);
-	}
+	
 
 	@Override
-	protected int getSuggestedMinimumHeight() {
+	protected int getSuggestedMinimumWidth() {
 		return mChildSize;
 	}
 
 	@Override
-	protected int getSuggestedMinimumWidth() {
-		return mLeftHolderWidth + mChildSize * getChildCount();
+	protected int getSuggestedMinimumHeight() {
+		return mHolderSize + (mChildSize + mGapSize) * (getChildCount()+1);
 	}
 
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(getSuggestedMinimumHeight(), MeasureSpec.EXACTLY));
-
-		final int count = getChildCount();
-		mChildGap = computeChildGap(getMeasuredWidth() - mLeftHolderWidth, count, mChildSize, 0);
-
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {		
+		super.onMeasure(MeasureSpec.makeMeasureSpec(getSuggestedMinimumWidth(), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(getSuggestedMinimumHeight(), MeasureSpec.EXACTLY));
+		
+		final int count = getChildCount();		
 		for (int i = 0; i < count; i++) {
 			getChildAt(i).measure(MeasureSpec.makeMeasureSpec(mChildSize, MeasureSpec.EXACTLY),
 					MeasureSpec.makeMeasureSpec(mChildSize, MeasureSpec.EXACTLY));
@@ -85,14 +76,26 @@ public class RayLayout extends ViewGroup {
 
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		final int paddingLeft = mLeftHolderWidth;
+		final int padding = mHolderSize;
 		final int childCount = getChildCount();
 
 		for (int i = 0; i < childCount; i++) {
-			Rect frame = computeChildFrame(mExpanded, paddingLeft, i, mChildGap, mChildSize);
+			Rect frame = computeChildFrame(mExpanded, padding, i, mGapSize, mChildSize);
 			getChildAt(i).layout(frame.left, frame.top, frame.right, frame.bottom);
 		}
 
+	}
+	
+	public int computeBottom(int index) {
+		final int padding = mHolderSize;
+		Rect frame = computeChildFrame(true, padding, index, mGapSize, mChildSize);
+		return frame.bottom;
+	}
+
+	private static Rect computeChildFrame(final boolean expanded, final int padding, final int childIndex,
+			final int gap, final int size) {
+		final int diff = expanded ? (padding + childIndex * (gap + size) + gap/2) : 0;
+			return new Rect(0, diff, size, diff + size);
 	}
 
 	/**
@@ -116,7 +119,7 @@ public class RayLayout extends ViewGroup {
 
 	private static Animation createExpandAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta,
 			long startOffset, long duration, Interpolator interpolator) {
-		Animation animation = new RotateAndTranslateAnimation(0, toXDelta, 0, toYDelta, 0, 720);
+		Animation animation = new RotateAndTranslateAnimation(0, toXDelta, 0, toYDelta, 0, 0);
 		animation.setStartOffset(startOffset);
 		animation.setDuration(duration);
 		animation.setInterpolator(interpolator);
@@ -131,7 +134,7 @@ public class RayLayout extends ViewGroup {
 		animationSet.setFillAfter(true);
 
 		final long preDuration = duration / 2;
-		Animation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f,
+		Animation rotateAnimation = new RotateAnimation(0, 0, Animation.RELATIVE_TO_SELF, 0.5f,
 				Animation.RELATIVE_TO_SELF, 0.5f);
 		rotateAnimation.setStartOffset(startOffset);
 		rotateAnimation.setDuration(preDuration);
@@ -140,7 +143,7 @@ public class RayLayout extends ViewGroup {
 
 		animationSet.addAnimation(rotateAnimation);
 
-		Animation translateAnimation = new RotateAndTranslateAnimation(0, toXDelta, 0, toYDelta, 360, 720);
+		Animation translateAnimation = new RotateAndTranslateAnimation(0, toXDelta, 0, toYDelta, 0, 0);
 		translateAnimation.setStartOffset(startOffset + preDuration);
 		translateAnimation.setDuration(duration - preDuration);
 		translateAnimation.setInterpolator(interpolator);
@@ -154,12 +157,12 @@ public class RayLayout extends ViewGroup {
 	private void bindChildAnimation(final View child, final int index, final long duration) {
 		final boolean expanded = mExpanded;
 		final int childCount = getChildCount();
-		Rect frame = computeChildFrame(!expanded, mLeftHolderWidth, index, mChildGap, mChildSize);
+		Rect frame = computeChildFrame(!expanded, mHolderSize, index, mGapSize, mChildSize);
 
 		final int toXDelta = frame.left - child.getLeft();
 		final int toYDelta = frame.top - child.getTop();
 
-		Interpolator interpolator = mExpanded ? new AccelerateInterpolator() : new OvershootInterpolator(1.5f);
+		Interpolator interpolator = mExpanded ? new AccelerateInterpolator() : new OvershootInterpolator(1.3f);
 		final long startOffset = computeStartOffset(childCount, mExpanded, index, 0.1f, duration, interpolator);
 
 		Animation animation = mExpanded ? createShrinkAnimation(0, toXDelta, 0, toYDelta, startOffset, duration,
@@ -236,8 +239,20 @@ public class RayLayout extends ViewGroup {
 		for (int i = 0; i < childCount; i++) {
 			getChildAt(i).clearAnimation();
 		}
-
+		
 		requestLayout();
+	}
+
+	public int getChildSize() {
+		return mChildSize;
+	}
+
+	public int getGapSize() {
+		return mGapSize;
+	}
+
+	public int getHolderSize() {
+		return mHolderSize;
 	}
 
 }

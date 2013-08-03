@@ -1,30 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <com.capricorn.RayLayout
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/item_layout"
-        android:layout_width="fill_parent"
+	<ImageView
+	    android:id="@+id/fade_background"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        custom:childSize="44px"
-        custom:leftHolderWidth="60dp" />
+        android:layout_gravity="top|center" />
+	
+	<LinearLayout
+	    android:id="@+id/item_layout"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_gravity="top|right"
+	    android:gravity="top|right"
+	    android:layout_margin="5dp"
+	    android:orientation="horizontal" >
+	    
+		    <LinearLayout
+		        android:id="@+id/item_title"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="top|right"
+		        android:layout_marginTop="52dp"
+		        android:gravity="right|center"
+		        android:orientation="vertical" />
+		    
+		    <com.masotros.floatingmenu.RayLayout
+		        xmlns:custom="http://schemas.android.com/apk/res-auto"
+		        android:id="@+id/item_icon"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="top|right"
+		        custom:childSize="52dp"
+		        custom:holderSize="52dp" 
+		        custom:gapSize="10dp" />
+	</LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/control_layout"
+    <ImageView
+        android:id="@+id/control_hint"
         android:layout_width="52dp"
         android:layout_height="52dp"
-        android:layout_centerVertical="true"
-        android:layout_margin="4dp"
-        android:background="@drawable/composer_button" >
-
-        <ImageView
-            android:id="@+id/control_hint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:duplicateParentState="true"
-            android:src="@drawable/composer_icn_plus" />
-    </FrameLayout>
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="top|right"
+        android:layout_margin="5dp" />
 
 </merge>

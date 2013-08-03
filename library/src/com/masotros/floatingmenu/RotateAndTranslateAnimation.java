@@ -12,9 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ *MODIFIED BY MASOTROS
  */
 
-package com.capricorn;
+package com.masotros.floatingmenu;
 
 import android.view.animation.Animation;
 import android.view.animation.Transformation;

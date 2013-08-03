@@ -14,63 +14,59 @@
  * limitations under the License.
  */
 
-package com.capricorn.example;
+package com.masotros.example;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.capricorn.ArcMenu;
-import com.capricorn.RayMenu;
+import com.masotros.floatingmenu.RayMenu;
 
-/**
- * 
- * @author Capricorn
- * 
- */
 public class MainActivity extends Activity {
 	private static final int[] ITEM_DRAWABLES = { R.drawable.composer_camera, R.drawable.composer_music,
 			R.drawable.composer_place, R.drawable.composer_sleep, R.drawable.composer_thought, R.drawable.composer_with };
-
+	private static final int[] ITEM_DRAWABLES_MOD = { R.drawable.ponele, R.drawable.rock,
+		R.drawable.atuvida, R.drawable.guuachin, R.drawable.locura, R.drawable.maquinaa };
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-		ArcMenu arcMenu = (ArcMenu) findViewById(R.id.arc_menu);
-
 		final int itemCount = ITEM_DRAWABLES.length;
-		for (int i = 0; i < itemCount; i++) {
-			ImageView item = new ImageView(this);
-			item.setImageResource(ITEM_DRAWABLES[i]);
-
-			final int position = i;
-			arcMenu.addItem(item, new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					Toast.makeText(MainActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
-				}
-			});// Add a menu item
-		}
+		
 
 		RayMenu rayMenu = (RayMenu) findViewById(R.id.ray_menu);
+		
+		getWindow().setFormat(PixelFormat.RGBA_8888);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		options.inDither = true;
+		Bitmap gradient = BitmapFactory.decodeResource(getResources(), R.drawable.top_fade, options);
+		rayMenu.setBackground(gradient);
+		
 		for (int i = 0; i < itemCount; i++) {
-			ImageView item = new ImageView(this);
-			item.setImageResource(ITEM_DRAWABLES[i]);
-
-			final int position = i;
-			rayMenu.addItem(item, new OnClickListener() {
+			ImageView itemIcon = new ImageView(this);
+			itemIcon.setImageResource(ITEM_DRAWABLES[i]);
+			ImageView itemTitle = new ImageView(this);
+			itemTitle.setImageResource(ITEM_DRAWABLES_MOD[i]);
+			//final int position = i;
+			rayMenu.addItem(itemIcon, itemTitle, new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-					Toast.makeText(MainActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
+					//Toast.makeText(MainActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
 				}
 			});// Add a menu item
+			
 		}
 	}
 }
